@@ -1,12 +1,17 @@
-const SHUTTER_SOUND_URL = '/shutter.wav'
-
 export function playShutterSound() {
   try {
-    const audio = new Audio(SHUTTER_SOUND_URL)
+    // iOS Safari works best with native Audio element inside user gesture
+    const audio = new Audio('./shutter.mp3')
     audio.volume = 1.0
-    audio.play().catch(err => {
-      console.warn('Shutter sound playback failed:', err)
-    })
+    
+    // Some browsers return a promise from play()
+    const playPromise = audio.play()
+    
+    if (playPromise !== undefined) {
+      playPromise.catch(err => {
+        console.warn('Audio play failed:', err)
+      })
+    }
   } catch (e) {
     console.warn('Audio creation failed:', e)
   }
