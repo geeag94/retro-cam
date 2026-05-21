@@ -1,15 +1,25 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 
 export default function useCamera(videoRef) {
   const [streamError, setStreamError] = useState(null)
+  const [facingMode, setFacingMode] = useState('user')
+
+  const toggleCamera = useCallback(() => {
+    setFacingMode(prev => prev === 'user' ? 'environment' : 'user')
+  }, [])
 
   useEffect(() => {
     let stream = null
 
     async function startCamera() {
       try {
+        // Stop previous stream
+        if (videoRef.current?.srcObject) {
+          videoRef.current.srcObject.getTracks().forEach(track => track.stop())
+        }
+
         stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } },
+          video: { facingMode, width: { ideal: 1280 }, height: { ideal: 720 } },
           audio: false,
         })
         if (videoRef.current) {
@@ -32,7 +42,7 @@ export default function useCamera(videoRef) {
         stream.getTracks().forEach(track => track.stop())
       }
     }
-  }, [videoRef])
+  }, [videoRef, facingMode])
 
-  return { streamError }
+  return { streamError, facingMode, toggleCamera }
 }

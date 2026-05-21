@@ -2,6 +2,7 @@ import { useState, useRef, useCallback } from 'react'
 import CameraView from './components/CameraView'
 import RecOverlay from './components/RecOverlay'
 import ControlPanel from './components/ControlPanel'
+import CameraSwitchButton from './components/CameraSwitchButton'
 import ShutterButton from './components/ShutterButton'
 import FlashEffect from './components/FlashEffect'
 import ThumbnailStrip from './components/ThumbnailStrip'
@@ -17,7 +18,7 @@ function App() {
   const videoRef = useRef(null)
   const canvasRef = useRef(document.createElement('canvas'))
 
-  const { streamError } = useCamera(videoRef)
+  const { streamError, facingMode, toggleCamera } = useCamera(videoRef)
   const { currentTime } = useClock()
 
   const handleCapture = useCallback(() => {
@@ -80,7 +81,10 @@ function App() {
 
       {/* Controls */}
       <div className="mt-6 flex flex-col items-center gap-4 z-10">
-        <ControlPanel filterMode={filterMode} onChange={setFilterMode} />
+        <div className="flex gap-3 items-center">
+          <ControlPanel filterMode={filterMode} onChange={setFilterMode} />
+          <CameraSwitchButton facingMode={facingMode} onClick={toggleCamera} />
+        </div>
         <ShutterButton onClick={handleCapture} />
       </div>
 
